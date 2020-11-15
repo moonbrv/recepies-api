@@ -18,4 +18,5 @@
                    :resource-paths ["dev/resources"]
                    :dependencies [[ring/ring-mock "0.4.0"]
                                   [integrant/repl "0.3.2"]]}}
+  :min-lein-version "2.0.0"
   :uberjar-name "recipes.jar")
