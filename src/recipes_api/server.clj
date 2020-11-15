@@ -1,14 +1,12 @@
 (ns recipes-api.server
   (:require
-   [reitit.ring :as ring]
    [ring.adapter.jetty :as jetty]
    [integrant.core :as ig]
-   [environ.core :refer [env]]))
+   [environ.core :refer [env]]
+   [recipes-api.router :as router]))
 
 (defn app [env]
-  (ring/ring-handler
-   (ring/router [["/" {:get {:handler (fn [req] {:status 200
-                                                 :body "Hello, Reitit"})}}]])))
+  (router/routes env))
 
 (defmethod ig/init-key :server/jetty [_ {:keys [handler port]}]
   (println (str "\nServer is running on port " port))

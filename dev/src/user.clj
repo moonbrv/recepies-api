@@ -14,13 +14,13 @@
 (def reset ig-repl/reset)
 (def reset-all ig-repl/reset-all)
 
-(defn app []
-  (-> state/system :recipes/app))
+(def app (-> state/system :recipes/app))
 
-(defn db []
-  (-> state/system :db/postgress))
+(def db (-> state/system :db/postgress))
 
 (comment
+  (app {:request-method :get
+        :uri "/swagger.json"})
   (go)
   (halt)
   (reset)
