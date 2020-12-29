@@ -8,13 +8,16 @@
 (defn app [env]
   (router/routes env))
 
+(defmethod ig/prep-key :server/jetty [_ config]
+  (merge config {:port (Integer/parseInt (env :port))}))
+
+(defmethod ig/prep-key :db/postgress [_ config]
+  (merge config {:jdbc-url (env :jdbc-database-url)}))
+
 (defmethod ig/init-key :server/jetty [_ {:keys [handler port]}]
   (println (str "\nServer is running on port " port))
   (jetty/run-jetty handler {:port port
                             :join? false}))
-
-(defmethod ig/prep-key :server/jetty [_ config]
-  (merge config {:port (Integer/parseInt (env :port))}))
 
 (defmethod ig/init-key :recipes/app [_ config]
   (println "\nStarted app")
