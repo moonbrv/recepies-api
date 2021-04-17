@@ -1,0 +1,5 @@
+{:server/jetty {:handler #ig/ref :recipes/app
+                :port 3030}
+ :recipes/app {:jdbc-url #ig/ref :db/postgress
+               :jwk-endpoint ""}
+ :db/postgress {:jdbc-url ""}}

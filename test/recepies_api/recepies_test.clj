@@ -8,7 +8,7 @@
 (deftest redipes-test
   (testing "list of all recipes"
     (testing "authorised user have public and drafts"
-      (let [{:keys [status body]} (st/test-endpoint :get "/v1/recipes")]
+      (let [{:keys [status body]} (st/test-endpoint :get "/v1/recipes" {:auth true})]
         (is (= 200 status))
         (is (vector? (:public body)))
         (is (vector? (:drafts body)))))

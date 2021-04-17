@@ -12,8 +12,11 @@
 (defmethod ig/prep-key :server/jetty [_ config]
   (merge config {:port (Integer/parseInt (env :port))}))
 
+(defmethod ig/prep-key :recipes/app [_ config]
+  (merge config {:jwk-endpoint (env :jwk-endpoint)}))
+
 (defmethod ig/prep-key :db/postgress [_ config]
-  (merge config {:jdbc-url (env :jdbc-database-url)}))
+  (merge config {:jdbc-url (env :jdbc-url)}))
 
 (defmethod ig/init-key :server/jetty [_ {:keys [handler port]}]
   (println (str "\nServer is running on port " port))

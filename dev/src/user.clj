@@ -1,5 +1,6 @@
 (ns user
   (:require
+   [clojure.tools.namespace.repl :refer [set-refresh-dirs]]
    [integrant.repl :as ig-repl]
    [integrant.core :as ig]
    [integrant.repl.state :as state]
@@ -7,6 +8,8 @@
    [next.jdbc.sql :as sql]
    [recipes-api.server]
    [recipes-api.recipe.handlers :as rh]))
+
+(set-refresh-dirs "src" "test")
 
 (ig-repl/set-prep!
  (fn []

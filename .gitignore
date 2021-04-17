@@ -6,7 +6,7 @@ pom.xml
 pom.xml.asc
 *.jar
 *.class
-/.lein-*
+/.lein-env
 /.nrepl-port
 /.prepl-port
 .hgignore
@@ -39,3 +39,6 @@ pom.xml.asc
 
 # direnv
 .envrc
+
+# config
+resources/config.edn

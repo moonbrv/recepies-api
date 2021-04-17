@@ -1,11 +1,14 @@
 (ns recipes-api.recipe.routes
   (:require
    [recipes-api.recipe.handlers :as recipe]
-   [recipes-api.responses :as responses]))
+   [recipes-api.responses :as responses]
+   [recipes-api.middleware :as mw]))
 
 (defn routes [env]
-  (let [db (:jdbc-url env)]
-    ["/recipes" {:swagger {:tags ["recipes"]}}
+  (let [{:keys [jwk-endpoint]
+         db :jdbc-url} env]
+    ["/recipes" {:swagger {:tags ["recipes"]}
+                 :middleware [[(mw/wrap-auth jwk-endpoint)]]}
      ["" {:get {:handler (recipe/list-all-recipes db)
                 :responses {200 {:body responses/recipes}}
                 :summary "List all recipes"}

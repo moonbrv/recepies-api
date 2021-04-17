@@ -1,4 +1,0 @@
-{:server/jetty {:handler #ig/ref :recipes/app
-                :port 3000}
- :recipes/app {:jdbc-url #ig/ref :db/postgress}
- :db/postgress {:jdbc-url "jdbc:postgresql://ec2-3-216-89-250.compute-1.amazonaws.com:5432/dc4tk1dvi8jcc0?password=2ec1359334fbf9ba994d4da44c9b39f4eec3be053a9d1d33881e1e047d6d0aae&sslmode=require&user=ukyclxnpxqgxwy"}}

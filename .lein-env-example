@@ -1,0 +1,10 @@
+{:jdbc-url ""
+ :jwk-endpoint ""
+ :port 3030
+ :auth0-token-url ""
+ :auth0-client-id ""
+ :auth0-audience ""
+ :auth0-grant-type ""
+ :auth0-username ""
+ :auth0-password ""
+ :auth0-scope ""}
