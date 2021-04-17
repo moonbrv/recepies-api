@@ -21,3 +21,16 @@
         (assoc recipe
                :recipe/steps steps
                :recipe/ingredients ingredients)))))
+
+(defn insert-recipe! [db recipe]
+  (sql/insert! db :recipe (assoc recipe
+                                 :favorite-count 0
+                                 :public false)))
+
+(defn update-recipe! [db {:keys [recipe-id] :as recipe}]
+  (let [result (sql/update! db :recipe recipe {:recipe-id recipe-id})]
+    (= (:next.jdbc/update-count result) 1)))
+
+(defn delete-recipe! [db id]
+  (let [result (sql/delete! db :recipe {:recipe-id id})]
+    (= (:next.jdbc/update-count result) 1)))

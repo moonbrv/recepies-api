@@ -1,11 +1,37 @@
 (ns recipes-api.recipe.routes
   (:require
-   [recipes-api.recipe.handlers :as handler]))
+   [recipes-api.recipe.handlers :as recipe]
+   [recipes-api.responses :as responses]))
 
 (defn routes [env]
   (let [db (:jdbc-url env)]
     ["/recipes" {:swagger {:tags ["recipes"]}}
-     ["" {:get {:handler (handler/list-all-recipes db)
-                :summary "List all recipes"}}]
-     ["/:recipe-id" {:get {:handler (handler/retrieve-recipe db)
-                           :summary "Retrieve recipe"}}]]))
+     ["" {:get {:handler (recipe/list-all-recipes db)
+                :responses {200 {:body responses/recipes}}
+                :summary "List all recipes"}
+
+          :post {:handler (recipe/create-recipe! db)
+                 :parameters {:body {:name string?
+                                     :prep-time number?
+                                     :img string?}}
+                 :responses {201 {:body {:recipe-id string?}}}
+                 :summary "Create new recipe"}}]
+
+     ["/:recipe-id" {:get {:handler (recipe/retrieve-recipe db)
+                           :parameters {:path {:recipe-id string?}}
+                           :responses {200 {:body responses/recipe}}
+                           :summary "Retrieve recipe"}
+
+                     :delete {:handler (recipe/delete-recipe! db)
+                              :parameters {:path {:recipe-id string?}}
+                              :responses {204 {:body nil?}}
+                              :summary "Delete recipe"}
+
+                     :put {:handler (recipe/update-recipe! db)
+                           :parameters {:path {:recipe-id string?}
+                                        :body {:name string?
+                                               :prep-time number?
+                                               :public boolean?
+                                               :img string?}}
+                           :responses {204 {:body nil?}}
+                           :summary "Update recipe"}}]]))

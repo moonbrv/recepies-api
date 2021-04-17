@@ -1,5 +1,6 @@
 (ns recipes-api.server
   (:require
+   [next.jdbc :as jdbc]
    [ring.adapter.jetty :as jetty]
    [integrant.core :as ig]
    [environ.core :refer [env]]
@@ -23,9 +24,10 @@
   (println "\nStarted app")
   (app config))
 
-(defmethod ig/init-key :db/postgress [_ config]
+(defmethod ig/init-key :db/postgress [_ {:keys [jdbc-url]}]
   (println "\nConfigured db")
-  (:jdbc-url config))
+  jdbc-url
+  (jdbc/with-options jdbc-url jdbc/snake-kebab-opts))
 
 (defmethod ig/halt-key! :server/jetty [_ jetty]
   (println "\nServer is stopped")
@@ -33,7 +35,6 @@
 
 
 (defn -main
-  "I don't do a whole lot ... yet."
   [config-file]
   (let [config (-> config-file slurp ig/read-string)]
     (-> config ig/prep ig/init)))
@@ -41,4 +42,4 @@
 (comment
   (app {:request-method :get
         :uri "/"})
-  (-main))
+  (-main "resources/config.edn"))

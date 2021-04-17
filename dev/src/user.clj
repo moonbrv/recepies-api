@@ -5,7 +5,8 @@
    [integrant.repl.state :as state]
    [next.jdbc :as jdbc]
    [next.jdbc.sql :as sql]
-   [recipes-api.server]))
+   [recipes-api.server]
+   [recipes-api.recipe.handlers :as rh]))
 
 (ig-repl/set-prep!
  (fn []
@@ -21,22 +22,34 @@
 (def db (-> state/system :db/postgress))
 
 (comment
-  (app {:request-method :get
-        :uri "/swagger.json"})
-  (jdbc/execute! db ["SELECT * FROM recipe WHERE public = true"])
 
-  (with-open [conn (jdbc/get-connection db)]
-    (let [recipe-id "a3dde84c-4a33-45aa-b0f3-4bf9ac997680"
-          recipe (sql/get-by-id conn :recipe recipe-id :recipe_id {})
-          steps (sql/find-by-keys conn :step {:recipe_id recipe-id})
-          ingredients (sql/find-by-keys conn :ingredient {:recipe_id recipe-id})]
-      (assoc recipe
-             :recipe/steps steps
-             :recipe/ingredients ingredients)))
+  (set! *print-namespace-maps* false)
 
-  (sql/find-by-keys db :recipe {:public false})
   (go)
   (halt)
   (reset)
-  ;;
-  )
+
+
+  (reset-all)
+
+
+  (-> (app {:request-method :get
+            :uri "/v1/recipes"})
+      :body
+      slurp)
+
+  (app {:request-method :get
+        :uri "/v1/recipes/a3dde84c-4a33-45aa-b0f3-4bf9ac997680"})
+
+  (-> (app {:request-method :post
+            :uri "/v1/recipes"
+            :body-params {:name "New test recipe"
+                          :prep-time 15
+                          :img "https://someimageurl.com/img.png"}})
+      :body
+      slurp)
+
+
+  (jdbc/execute! db ["SELECT * FROM recipe WHERE public = true"])
+
+  (sql/find-by-keys db :recipe {:public false}))

@@ -1,5 +1,8 @@
 (ns recipes-api.router
   (:require
+   [reitit.coercion.spec :as coercion-spec]
+   [reitit.ring.coercion :as coercion]
+   [reitit.ring.middleware.exception :as exception]
    [reitit.ring :as ring]
    [reitit.swagger :as swagger]
    [reitit.swagger-ui :as swagger-ui]
@@ -8,8 +11,12 @@
    [recipes-api.recipe.routes :as recipe]))
 
 (def router-config {:data {:muuntaja m/instance
+                           :coercion coercion-spec/coercion
                            :middleware [swagger/swagger-feature
-                                        muuntaja/format-middleware]}})
+                                        muuntaja/format-middleware
+                                        exception/exception-middleware
+                                        coercion/coerce-request-middleware
+                                        coercion/coerce-response-middleware]}})
 
 (def swagger-docs
   ["/swagger.json" {:get {:no-doc true
