@@ -13,6 +13,7 @@ pom.xml.asc
 .hg/
 .cpcache/
 .DS_Store
+.lsp
 
 
 /*-init.clj
