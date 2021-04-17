@@ -45,8 +45,7 @@
   (fn [req]
     (let [recipe-id (get-recipe-id req)
           recipe (get-in req [:parameters :body])
-          updated? (recipe-db/update-recipe! db (recipe-db/insert-recipe! db
-                                                                          (assoc recipe :recipe-id recipe-id)))]
+          updated? (recipe-db/update-recipe! db (assoc recipe :recipe-id recipe-id))]
       (if updated?
         (rr/status 204)
         (rr/not-found (not-found-params recipe-id))))))
