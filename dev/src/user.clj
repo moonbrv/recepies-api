@@ -54,4 +54,27 @@
 
   (jdbc/execute! db ["SELECT * FROM recipe WHERE public = true"])
 
+
+  (sql/insert! db :recipe-favorite {:uid "auth0|607ac0f60686bf00757e502b"
+                                    :recipe-id "de174076-8304-44bc-bb1e-ce2c1ce2e66b"})
+  (jdbc/execute-one! db ["UPDATE recipe 
+                                SET favorite_count = favorite_count + 1 
+                                WHERE recipe_id = ?" "de174076-8304-44bc-bb1e-ce2c1ce2e66b"])
+
+  (sql/insert! db :ingredient {:recipe-id "de174076-8304-44bc-bb1e-ce2c1ce2e66b"
+                               :ingredient-id "tes1t"
+                               :name "some name"
+                               :amount 1
+                               :measure "kg"
+                               :sort 1})
+
+  ((rh/create-ingredient! db) {:parameters {:path {:recipe-id "de174076-8304-44bc-bb1e-ce2c1ce2e66b"}
+                                            :body {:name "some name"
+                                                   :amount 1
+                                                   :measure "kg"
+                                                   :sort 1}}})
+
+
+
+
   (sql/find-by-keys db :recipe {:public false}))

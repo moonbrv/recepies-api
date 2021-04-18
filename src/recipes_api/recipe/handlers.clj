@@ -19,6 +19,11 @@
    :message "Step not found"
    :data (str "step-id " step-id)})
 
+(defn not-found-ingredient [ingredient-id]
+  {:type "ingredient-not-found"
+   :message "Ingredient not found"
+   :data (str "ingredient-id " ingredient-id)})
+
 (defn list-all-recipes [db]
   (fn [req]
     (let [uid (get-uid req)
@@ -106,3 +111,30 @@
       (if deleted?
         (rr/status 204)
         (rr/not-found (not-found-step step-id))))))
+
+(defn create-ingredient! [db]
+  (fn [req]
+    (let [ingredient-id (str (UUID/randomUUID))
+          recipe-id (get-recipe-id req)
+          ingredient (get-in req [:parameters :body])]
+      (recipe-db/insert-ingredient! db (assoc ingredient
+                                              :ingredient-id ingredient-id
+                                              :recipe-id recipe-id))
+      (rr/created (str responses/base-url "/recipes/" recipe-id)
+                  {:ingredient-id ingredient-id}))))
+
+(defn update-ingredient! [db]
+  (fn [req]
+    (let [ingredient (get-in req [:parameters :body])
+          updated? (recipe-db/update-ingredient! db ingredient)]
+      (if updated?
+        (rr/status 204)
+        (rr/not-found (not-found-ingredient (:ingredient-id ingredient)))))))
+
+(defn delete-ingredient! [db]
+  (fn [req]
+    (let [ingredient-id (get-in req [:parameters :body :ingredient-id])
+          deleted? (recipe-db/delete-ingredient! db ingredient-id)]
+      (if deleted?
+        (rr/status 204)
+        (rr/not-found (not-found-ingredient ingredient-id))))))

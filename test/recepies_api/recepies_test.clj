@@ -36,9 +36,19 @@
 (def update-step
   (update step :sort inc))
 
+(def ingredient
+  {:name "some ingredient"
+   :sort 0
+   :measure "kg"
+   :amount 1})
+
+(def update-ingredient
+  (update ingredient :sort inc))
+
 (deftest recipe-test
   (let [recipe-id (atom nil)
-        step-id (atom nil)]
+        step-id (atom nil)
+        ingredient-id (atom nil)]
     (testing "create recipe"
       (let [{:keys [status body]} (st/test-endpoint :post "/v1/recipes" {:auth true
                                                                          :body recipe})]
@@ -58,7 +68,7 @@
         (is (= status 201))
         (reset! step-id (:step-id body))))
 
-    (testing "update-step"
+    (testing "update step"
       (let [{:keys [status]} (st/test-endpoint :put
                                                (str "/v1/recipes/" @recipe-id "/steps")
                                                {:auth true
@@ -71,6 +81,29 @@
                                                (str "/v1/recipes/" @recipe-id "/steps")
                                                {:auth true
                                                 :body {:step-id @step-id}})]
+        (is (= status 204))))
+
+    (testing "create ingredient"
+      (let [{:keys [status body]} (st/test-endpoint :post
+                                                    (str "/v1/recipes/" @recipe-id "/ingredients")
+                                                    {:auth true
+                                                     :body ingredient})]
+        (is (= status 201))
+        (reset! ingredient-id (:ingredient-id body))))
+
+    (testing "update ingredient"
+      (let [{:keys [status]} (st/test-endpoint :put
+                                               (str "/v1/recipes/" @recipe-id "/ingredients")
+                                               {:auth true
+                                                :body (assoc update-ingredient
+                                                             :ingredient-id @ingredient-id)})]
+        (is (= status 204))))
+
+    (testing "delete ingredient"
+      (let [{:keys [status]} (st/test-endpoint :delete
+                                               (str "/v1/recipes/" @recipe-id "/ingredients")
+                                               {:auth true
+                                                :body {:ingredient-id @ingredient-id}})]
         (is (= status 204))))
 
     (testing "favorite recipe"
@@ -93,5 +126,9 @@
   (st/test-endpoint :post "/v1/recipes" {:auth true
                                          :body recipe})
   (st/test-endpoint :post
-                    (str "/v1/recipes/de174076-8304-44bc-bb1e-ce2c1ce2e66b/favorite")
-                    {:auth true}))
+                    (str "/v1/recipes/de174076-8304-44bc-bb1e-ce2c1ce2e66b/ingredients")
+                    {:auth true
+                     :body {:name "some name"
+                            :amount 1
+                            :measure "kg"
+                            :sort 1}}))

@@ -60,3 +60,12 @@
 
 (defn delete-step! [db step-id]
   (u/db-data-updated? (sql/delete! db :step {:step-id step-id})))
+
+(defn insert-ingredient! [db ingredient]
+  (sql/insert! db :ingredient ingredient))
+
+(defn update-ingredient! [db {:keys [ingredient-id] :as ingredient}]
+  (u/db-data-updated? (sql/update! db :ingredient ingredient {:ingredient-id ingredient-id})))
+
+(defn delete-ingredient! [db ingredient-id]
+  (u/db-data-updated? (sql/delete! db :ingredient {:ingredient-id ingredient-id})))
