@@ -2,14 +2,12 @@
   (:require
    [recipes-api.recipe.db :as recipe-db]
    [recipes-api.responses :as responses]
-   [ring.util.response :as rr])
+   [ring.util.response :as rr]
+   [recipes-api.utils :refer [get-uid
+                              get-recipe-id]])
   (:import (java.util UUID)))
 
-(defn get-uid [req]
-  (get-in req [:claims :sub]))
 
-(defn get-recipe-id [req]
-  (get-in req [:parameters :path :recipe-id]))
 
 (defn not-found-params [recipe-id]
   {:type "recipe-not-found"

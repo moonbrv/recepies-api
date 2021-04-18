@@ -26,11 +26,13 @@
                            :summary "Retrieve recipe"}
 
                      :delete {:handler (recipe/delete-recipe! db)
+                              :middleware [[mw/wrap-check-recipe-owner db]]
                               :parameters {:path {:recipe-id string?}}
                               :responses {204 {:body nil?}}
                               :summary "Delete recipe"}
 
                      :put {:handler (recipe/update-recipe! db)
+                           :middleware [[mw/wrap-check-recipe-owner db]]
                            :parameters {:path {:recipe-id string?}
                                         :body {:name string?
                                                :prep-time number?

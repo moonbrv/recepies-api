@@ -5,6 +5,8 @@
             [muuntaja.core :as m]
             [recepies-api.system-test :as st]))
 
+(use-fixtures :once st/token-fixture)
+
 (deftest redipes-test
   (testing "list of all recipes"
     (testing "authorised user have public and drafts"
