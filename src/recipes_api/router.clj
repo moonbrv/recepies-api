@@ -7,11 +7,13 @@
    [reitit.swagger :as swagger]
    [reitit.swagger-ui :as swagger-ui]
    [reitit.ring.middleware.muuntaja :as muuntaja]
+   [reitit.ring.spec :as rspec]
    [reitit.dev.pretty :as pretty]
    [muuntaja.core :as m]
    [recipes-api.recipe.routes :as recipe]))
 
 (def router-config {:exception pretty/exception
+                    :validate rspec/validate
                     :data {:muuntaja m/instance
                            :coercion coercion-spec/coercion
                            :middleware [swagger/swagger-feature
