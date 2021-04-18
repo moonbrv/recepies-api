@@ -51,3 +51,12 @@
                                 SET favorite_count = favorite_count - 1 
                                 WHERE recipe_id = ?" id]))
       u/db-data-updated?))
+
+(defn insert-step! [db step]
+  (sql/insert! db :step step))
+
+(defn update-step! [db {:keys [step-id] :as step}]
+  (u/db-data-updated? (sql/update! db :step step {:step-id step-id})))
+
+(defn delete-step! [db step-id]
+  (u/db-data-updated? (sql/delete! db :step {:step-id step-id})))

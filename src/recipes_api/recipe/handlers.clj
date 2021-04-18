@@ -9,10 +9,15 @@
 
 
 
-(defn not-found-params [recipe-id]
+(defn not-found-recipe [recipe-id]
   {:type "recipe-not-found"
    :message "Recipe not found"
    :data (str "recipe-id " recipe-id)})
+
+(defn not-found-step [step-id]
+  {:type "step-not-found"
+   :message "Step not found"
+   :data (str "step-id " step-id)})
 
 (defn list-all-recipes [db]
   (fn [req]
@@ -26,12 +31,12 @@
           recipe (recipe-db/find-recipe-by-id db recipe-id)]
       (if (some? recipe)
         (rr/response recipe)
-        (rr/not-found (not-found-params recipe-id))))))
+        (rr/not-found (not-found-recipe recipe-id))))))
 
 (defn create-recipe! [db]
   (fn [req]
     (let [recipe-id (str (UUID/randomUUID))
-          uid (-> req :claims :sub)
+          uid (get-uid req)
           recipe (get-in req [:parameters :body])]
       (recipe-db/insert-recipe! db (assoc recipe
                                           :recipe-id recipe-id
@@ -46,7 +51,7 @@
           updated? (recipe-db/update-recipe! db (assoc recipe :recipe-id recipe-id))]
       (if updated?
         (rr/status 204)
-        (rr/not-found (not-found-params recipe-id))))))
+        (rr/not-found (not-found-recipe recipe-id))))))
 
 
 (defn delete-recipe! [db]
@@ -55,7 +60,7 @@
           deleted? (recipe-db/delete-recipe! db recipe-id)]
       (if deleted?
         (rr/status 204)
-        (rr/not-found (not-found-params recipe-id))))))
+        (rr/not-found (not-found-recipe recipe-id))))))
 
 (defn favorite-recipe! [db]
   (fn [req]
@@ -64,7 +69,7 @@
           updated? (recipe-db/favorite-recipe! db recipe-id uid)]
       (if updated?
         (rr/status 204)
-        (rr/not-found (not-found-params recipe-id))))))
+        (rr/not-found (not-found-recipe recipe-id))))))
 
 (defn unfavorite-recipe! [db]
   (fn [req]
@@ -73,4 +78,31 @@
           updated? (recipe-db/unfavorite-recipe! db recipe-id uid)]
       (if updated?
         (rr/status 204)
-        (rr/not-found (not-found-params recipe-id))))))
+        (rr/not-found (not-found-recipe recipe-id))))))
+
+(defn create-step! [db]
+  (fn [req]
+    (let [step-id (str (UUID/randomUUID))
+          recipe-id (get-recipe-id req)
+          step (get-in req [:parameters :body])]
+      (recipe-db/insert-step! db (assoc step
+                                        :step-id step-id
+                                        :recipe-id recipe-id))
+      (rr/created (str responses/base-url "/recipes/" recipe-id)
+                  {:step-id step-id}))))
+
+(defn update-step! [db]
+  (fn [req]
+    (let [step (get-in req [:parameters :body])
+          updated? (recipe-db/update-step! db step)]
+      (if updated?
+        (rr/status 204)
+        (rr/not-found (not-found-step (:step-id step)))))))
+
+(defn delete-step! [db]
+  (fn [req]
+    (let [step-id (get-in req [:parameters :body :step-id])
+          deleted? (recipe-db/delete-step! db step-id)]
+      (if deleted?
+        (rr/status 204)
+        (rr/not-found (not-found-step step-id))))))

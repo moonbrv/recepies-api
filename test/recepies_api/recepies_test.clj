@@ -29,8 +29,16 @@
 (def update-recipe
   (assoc recipe :public true))
 
+(def step
+  {:sort 0
+   :description "sort decription"})
+
+(def update-step
+  (update step :sort inc))
+
 (deftest recipe-test
-  (let [recipe-id (atom nil)]
+  (let [recipe-id (atom nil)
+        step-id (atom nil)]
     (testing "create recipe"
       (let [{:keys [status body]} (st/test-endpoint :post "/v1/recipes" {:auth true
                                                                          :body recipe})]
@@ -40,6 +48,29 @@
     (testing "update recipe"
       (let [{:keys [status]} (st/test-endpoint :put (str "/v1/recipes/" @recipe-id) {:auth true
                                                                                      :body update-recipe})]
+        (is (= status 204))))
+
+    (testing "create step"
+      (let [{:keys [status body]} (st/test-endpoint :post
+                                                    (str "/v1/recipes/" @recipe-id "/steps")
+                                                    {:auth true
+                                                     :body step})]
+        (is (= status 201))
+        (reset! step-id (:step-id body))))
+
+    (testing "update-step"
+      (let [{:keys [status]} (st/test-endpoint :put
+                                               (str "/v1/recipes/" @recipe-id "/steps")
+                                               {:auth true
+                                                :body (assoc update-step
+                                                             :step-id @step-id)})]
+        (is (= status 204))))
+
+    (testing "delete step"
+      (let [{:keys [status]} (st/test-endpoint :delete
+                                               (str "/v1/recipes/" @recipe-id "/steps")
+                                               {:auth true
+                                                :body {:step-id @step-id}})]
         (is (= status 204))))
 
     (testing "favorite recipe"
