@@ -18,7 +18,8 @@
   ([method path {:keys [body auth]}]
    (let [app (:recipes/app state/system)
          response (app (cond-> (mock/request method path)
-                         auth (mock/header :authorization (str "Bearer " @token))
+                         auth (mock/header :authorization (str "Bearer " (or @token
+                                                                             (auth/get-test-token env))))
                          body (mock/json-body body)))]
      (update response :body (partial m/decode "application/json")))))
 

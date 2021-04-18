@@ -1,7 +1,8 @@
 (ns recipes-api.recipe.db
   (:require
    [next.jdbc :as jdbc]
-   [next.jdbc.sql :as sql]))
+   [next.jdbc.sql :as sql]
+   [recipes-api.utils :as u]))
 
 (defn find-all-recipes [db uid]
   (with-open [conn (jdbc/get-connection db)]
@@ -28,9 +29,25 @@
                                  :public false)))
 
 (defn update-recipe! [db {:keys [recipe-id] :as recipe}]
-  (let [result (sql/update! db :recipe recipe {:recipe-id recipe-id})]
-    (= (:next.jdbc/update-count result) 1)))
+  (u/db-data-updated? (sql/update! db :recipe recipe {:recipe-id recipe-id})))
 
 (defn delete-recipe! [db id]
-  (let [result (sql/delete! db :recipe {:recipe-id id})]
-    (= (:next.jdbc/update-count result) 1)))
+  (u/db-data-updated? (sql/delete! db :recipe {:recipe-id id})))
+
+(defn favorite-recipe! [db id uid]
+  (-> (jdbc/with-transaction [tx db]
+        (sql/insert! tx :recipe-favorite {:uid uid
+                                          :recipe-id id} (:options db))
+        (jdbc/execute-one! tx ["UPDATE recipe 
+                                SET favorite_count = favorite_count + 1 
+                                WHERE recipe_id = ?" id]))
+      u/db-data-updated?))
+
+(defn unfavorite-recipe! [db id uid]
+  (-> (jdbc/with-transaction [tx db]
+        (sql/delete! tx :recipe-favorite {:uid uid
+                                          :recipe-id id} (:options db))
+        (jdbc/execute-one! tx ["UPDATE recipe 
+                                SET favorite_count = favorite_count - 1 
+                                WHERE recipe_id = ?" id]))
+      u/db-data-updated?))

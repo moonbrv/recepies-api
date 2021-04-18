@@ -7,7 +7,7 @@
 
 (use-fixtures :once st/token-fixture)
 
-(deftest redipes-test
+(deftest recipes
   (testing "list of all recipes"
     (testing "authorised user have public and drafts"
       (let [{:keys [status body]} (st/test-endpoint :get "/v1/recipes" {:auth true})]
@@ -36,10 +36,31 @@
                                                                          :body recipe})]
         (is (= status 201))
         (reset! recipe-id (:recipe-id body))))
+
     (testing "update recipe"
       (let [{:keys [status]} (st/test-endpoint :put (str "/v1/recipes/" @recipe-id) {:auth true
                                                                                      :body update-recipe})]
         (is (= status 204))))
+
+    (testing "favorite recipe"
+      (let [{:keys [status]} (st/test-endpoint :post
+                                               (str "/v1/recipes/" @recipe-id "/favorite")
+                                               {:auth true})]
+        (is (= status 204))))
+
+    (testing "unfavorite recipe"
+      (let [{:keys [status]} (st/test-endpoint :delete
+                                               (str "/v1/recipes/" @recipe-id "/favorite")
+                                               {:auth true})]
+        (is (= status 204))))
+
     (testing "delete recipe"
       (let [{:keys [status]} (st/test-endpoint :delete (str "/v1/recipes/" @recipe-id) {:auth true})]
         (is (= status 204))))))
+
+(comment
+  (st/test-endpoint :post "/v1/recipes" {:auth true
+                                         :body recipe})
+  (st/test-endpoint :post
+                    (str "/v1/recipes/de174076-8304-44bc-bb1e-ce2c1ce2e66b/favorite")
+                    {:auth true}))

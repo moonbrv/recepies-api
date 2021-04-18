@@ -20,23 +20,34 @@
                  :responses {201 {:body {:recipe-id string?}}}
                  :summary "Create new recipe"}}]
 
-     ["/:recipe-id" {:get {:handler (recipe/retrieve-recipe db)
+     ["/:recipe-id"
+      ["" {:get {:handler (recipe/retrieve-recipe db)
+                 :parameters {:path {:recipe-id string?}}
+                 :responses {200 {:body responses/recipe}}
+                 :summary "Retrieve recipe"}
+
+           :delete {:handler (recipe/delete-recipe! db)
+                    :middleware [[mw/wrap-check-recipe-owner db]]
+                    :parameters {:path {:recipe-id string?}}
+                    :responses {204 {:body nil?}}
+                    :summary "Delete recipe"}
+
+           :put {:handler (recipe/update-recipe! db)
+                 :middleware [[mw/wrap-check-recipe-owner db]]
+                 :parameters {:path {:recipe-id string?}
+                              :body {:name string?
+                                     :prep-time number?
+                                     :public boolean?
+                                     :img string?}}
+                 :responses {204 {:body nil?}}
+                 :summary "Update recipe"}}]
+
+      ["/favorite" {:post {:handler (recipe/favorite-recipe! db)
                            :parameters {:path {:recipe-id string?}}
-                           :responses {200 {:body responses/recipe}}
-                           :summary "Retrieve recipe"}
-
-                     :delete {:handler (recipe/delete-recipe! db)
-                              :middleware [[mw/wrap-check-recipe-owner db]]
-                              :parameters {:path {:recipe-id string?}}
-                              :responses {204 {:body nil?}}
-                              :summary "Delete recipe"}
-
-                     :put {:handler (recipe/update-recipe! db)
-                           :middleware [[mw/wrap-check-recipe-owner db]]
-                           :parameters {:path {:recipe-id string?}
-                                        :body {:name string?
-                                               :prep-time number?
-                                               :public boolean?
-                                               :img string?}}
                            :responses {204 {:body nil?}}
-                           :summary "Update recipe"}}]]))
+                           :summary "Favorite recipe"}
+
+                    :delete {:handler (recipe/unfavorite-recipe! db)
+                             :parameters {:path {:recipe-id string?}}
+                             :responses {204 {:body nil?}}
+                             :summary "Unfavorite recipe"}}]]]))

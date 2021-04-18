@@ -56,3 +56,21 @@
       (if deleted?
         (rr/status 204)
         (rr/not-found (not-found-params recipe-id))))))
+
+(defn favorite-recipe! [db]
+  (fn [req]
+    (let [uid (get-uid req)
+          recipe-id (get-recipe-id req)
+          updated? (recipe-db/favorite-recipe! db recipe-id uid)]
+      (if updated?
+        (rr/status 204)
+        (rr/not-found (not-found-params recipe-id))))))
+
+(defn unfavorite-recipe! [db]
+  (fn [req]
+    (let [uid (get-uid req)
+          recipe-id (get-recipe-id req)
+          updated? (recipe-db/unfavorite-recipe! db recipe-id uid)]
+      (if updated?
+        (rr/status 204)
+        (rr/not-found (not-found-params recipe-id))))))
