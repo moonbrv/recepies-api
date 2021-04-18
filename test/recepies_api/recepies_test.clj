@@ -55,6 +55,11 @@
         (is (= status 201))
         (reset! recipe-id (:recipe-id body))))
 
+    (testing "retrieve recipe"
+      (let [{:keys [status body]} (st/test-endpoint :get (str "/v1/recipes/" @recipe-id))]
+        (is (= status 200))
+        (is (= (:recipe/recipe_id body) @recipe-id))))
+
     (testing "update recipe"
       (let [{:keys [status]} (st/test-endpoint :put (str "/v1/recipes/" @recipe-id) {:auth true
                                                                                      :body update-recipe})]
@@ -125,6 +130,8 @@
 (comment
   (st/test-endpoint :post "/v1/recipes" {:auth true
                                          :body recipe})
+
+  (st/test-endpoint :get (str "/v1/recipes/de174076-8304-44bc-bb1e-ce2c1ce2e66b"))
   (st/test-endpoint :post
                     (str "/v1/recipes/de174076-8304-44bc-bb1e-ce2c1ce2e66b/ingredients")
                     {:auth true
