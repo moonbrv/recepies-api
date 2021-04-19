@@ -10,7 +10,8 @@
    [reitit.ring.spec :as rspec]
    [reitit.dev.pretty :as pretty]
    [muuntaja.core :as m]
-   [recipes-api.recipe.routes :as recipe]))
+   [recipes-api.recipe.routes :as recipe]
+   [recipes-api.account.routes :as account]))
 
 (def router-config {:exception pretty/exception
                     :validate rspec/validate
@@ -33,6 +34,8 @@
 (defn routes [env]
   (ring/ring-handler
    (ring/router [swagger-docs
-                 ["/v1" (recipe/routes env)]]
+                 ["/v1"
+                  (recipe/routes env)
+                  (account/routes env)]]
                 router-config)
    (ring/routes (swagger-ui/create-swagger-ui-handler {:path "/"}))))
