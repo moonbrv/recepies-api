@@ -6,10 +6,10 @@
    [recipes-api.utils :refer [get-uid
                               get-recipe-id]]))
 
-(defn wrap-auth [jwk-endpoint]
+(def wrap-auth
   {:name ::auth0
    :description "Middleware for auth0 authentication and authorization"
-   :wrap (fn [handler]
+   :wrap (fn [handler jwk-endpoint]
            (jwt/wrap-jwt handler {:alg :RS256
                                   :jwk-endpoint jwk-endpoint}))})
 
@@ -25,5 +25,20 @@
                  (handler request)
                  (-> (rr/response {:message "You need to be recipe owner"
                                    :data (str "recipe-id " recipe-id)
+                                   :type :authorization-required})
+                     (rr/status 401))))))})
+
+(def wrap-managed-recipes
+  {:name ::manage-recipes
+   :description "Middleware to check if user able to manage recipes"
+   :wrap (fn [handler {:keys [auth0-roles-api-identifer
+                              auth0-manage-role-name] :as env}]
+           (fn [request]
+             (let [roles-key (str auth0-roles-api-identifer "/roles")
+                   roles (set (get-in request [:claims roles-key]))]
+               (if (contains? roles auth0-manage-role-name)
+                 (handler request)
+                 (-> (rr/response {:message "You need a cook to manage recipes"
+                                   :data (:uri request)
                                    :type :authorization-required})
                      (rr/status 401))))))})

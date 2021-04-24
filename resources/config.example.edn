@@ -6,5 +6,7 @@
                :auth0-token-url ""
                :auth0-audience ""
                :auth0-manage-client-id ""
-               :auth0-manage-client-secret ""}
+               :auth0-manage-client-secret ""
+               :auth0-manage-role-name ""
+               :auth0-roles-api-identifer ""}
  :db/postgress {:jdbc-url ""}}

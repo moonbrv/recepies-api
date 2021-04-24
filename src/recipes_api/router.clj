@@ -9,11 +9,13 @@
    [reitit.ring.middleware.muuntaja :as muuntaja]
    [reitit.ring.spec :as rspec]
    [reitit.dev.pretty :as pretty]
+   [reitit.ring.middleware.dev :as dev]
    [muuntaja.core :as m]
    [recipes-api.recipe.routes :as recipe]
    [recipes-api.account.routes :as account]))
 
 (def router-config {:exception pretty/exception
+                    :reitit.middleware/transform dev/print-request-diffs
                     :validate rspec/validate
                     :data {:muuntaja m/instance
                            :coercion coercion-spec/coercion
