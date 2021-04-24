@@ -1,5 +1,10 @@
 {:server/jetty {:handler #ig/ref :recipes/app
                 :port 3030}
  :recipes/app {:jdbc-url #ig/ref :db/postgress
-               :jwk-endpoint ""}
+               :jwk-endpoint ""
+               :auth0-api-base-url ""
+               :auth0-token-url ""
+               :auth0-audience ""
+               :auth0-manage-client-id ""
+               :auth0-manage-client-secret ""}
  :db/postgress {:jdbc-url ""}}

@@ -6,3 +6,6 @@
 
 (defn insert-account! [db account]
   (sql/insert! db :account account))
+
+(defn delete-account! [db id]
+  (sql/delete! db :account {:uid id}))
