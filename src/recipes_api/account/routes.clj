@@ -10,7 +10,7 @@
     ["/account" {:swagger {:tags ["account"]}
                  :middleware [[mw/wrap-auth jwk-endpoint]]}
      ["" {:post {:handler (account/create-account! db)
-                 :responses {204 {:body nil?}}
+                 :responses {201 {:body nil?}}
                  :summary "Create account"}
           :put {:handler (account/update-role-to-cook! env)
                 :responses {204 {:body nil?}}

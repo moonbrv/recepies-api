@@ -4,9 +4,8 @@
    [clj-http.client :as http]
    [muuntaja.core :as m]))
 
-(defn get-test-token [{:keys [auth0-token-url auth0-test-token-client-id
-                              auth0-audience auth0-test-token-username
-                              auth0-test-token-password]}]
+(defn get-test-token [{:keys [auth0-token-url auth0-test-token-client-id auth0-audience]}
+                      {:keys [email password]}]
   (-> (http/post auth0-token-url
                  {:content-type :json
                   :cookie-policy :standard
@@ -14,8 +13,8 @@
                                   {:client_id auth0-test-token-client-id
                                    :audience auth0-audience
                                    :grant_type "password"
-                                   :username auth0-test-token-username
-                                   :password auth0-test-token-password
+                                   :username email
+                                   :password password
                                    :scope "openid profile email"})})
       m/decode-response-body
       :access_token))
@@ -49,7 +48,50 @@
          first
          :id)))
 
+(defn create-auth-user
+  ([env params] (create-auth-user env params nil))
+  ([{:keys [auth0-api-base-url] :as env}
+    {:keys [connection
+            email
+            password]}
+    management-token]
+   (let [token (or management-token
+                   (get-management-token env))]
+     (->> {:headers {"Authorization" (str "Bearer " token)}
+           :throw-exceptions false
+           :content-type :json
+           :cookie-policy :standard
+           :body (m/encode "application/json"
+                           {:connection connection
+                            :email email
+                            :password password})}
+          (http/post (str auth0-api-base-url "/api/v2/users"))
+          m/decode-response-body))))
+
+(defn delete-auth-user
+  ([env uid] (delete-auth-user env uid nil))
+  ([{:keys [auth0-api-base-url] :as env} uid management-token]
+   (let [token (or management-token
+                   (get-management-token env))]
+     (->> {:headers {"Authorization" (str "Bearer " token)}
+           :throw-exceptions false
+           :content-type :json
+           :cookie-policy :standard}
+          (http/delete (str auth0-api-base-url "/api/v2/users/" uid))))))
+
 (comment
+  (create-auth-user env {:connection "Username-Password-Authentication"
+                         :email "account.test@recipe.api"
+                         :password "s0m3P@ssword"})
+
+  (let [{:keys [auth0-api-base-url auth0-manage-role-name]} env
+        token (get-management-token env)]
+    (->> {:headers {"Authorization" (str "Bearer " token)}
+          :throw-exceptions false
+          :content-type :json
+          :cookie-policy :standard}
+         (http/delete (str auth0-api-base-url "/api/v2/users/auth0|60852e071adc0600706c556f"))))
+
   (:auth0-manage-role-name env)
   (get-management-token env)
   (let [{:keys [auth0-api-base-url auth0-manage-role-name]} env
@@ -73,5 +115,4 @@
                      :content-type :json
                      :cookie-policy :standard
                      :throw-exceptions false
-                     :headers {"Authorization" (str "Bearer " management-token)}})))
-  (get-test-token env))
+                     :headers {"Authorization" (str "Bearer " management-token)}}))))

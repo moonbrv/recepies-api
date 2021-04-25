@@ -15,7 +15,7 @@
       (account-db/insert-account! db {:uid sub
                                       :name uname
                                       :picture picture})
-      (rr/status 204))))
+      (rr/status 201))))
 
 (defn delete-account! [db {:keys [auth0-api-base-url] :as env}]
   (fn [request]

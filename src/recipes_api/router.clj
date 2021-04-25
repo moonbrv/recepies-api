@@ -15,7 +15,7 @@
    [recipes-api.account.routes :as account]))
 
 (def router-config {:exception pretty/exception
-                    :reitit.middleware/transform dev/print-request-diffs
+                    ;; :reitit.middleware/transform dev/print-request-diffs
                     :validate rspec/validate
                     :data {:muuntaja m/instance
                            :coercion coercion-spec/coercion
