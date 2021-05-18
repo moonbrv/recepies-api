@@ -5,7 +5,7 @@
             [muuntaja.core :as m]
             [recepies-api.system-test :as st]))
 
-(use-fixtures :once st/token-fixture)
+(use-fixtures :once st/recipe-fixture)
 
 (deftest recipes
   (testing "list of all recipes"
